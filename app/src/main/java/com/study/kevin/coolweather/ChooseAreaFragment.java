@@ -2,6 +2,7 @@ package com.study.kevin.coolweather;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -65,7 +66,6 @@ public class ChooseAreaFragment extends Fragment {
      * 市列表
      */
     private List<City> cityList;
-
     /**
      * 县列表
      */
@@ -111,6 +111,12 @@ public class ChooseAreaFragment extends Fragment {
                 }else if (currentLevel == LEVEL_CITY){
                     selectedCity =cityList.get(position);
                     queryCountries();
+                }else if (currentLevel == LEVEL_COUNTRY){
+                    String weatherId = countryList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(),WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -178,10 +184,10 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCountries() {
         titleText.setText(selectedCity.getCityName());
         backButton.setVisibility(View.VISIBLE);
-        countryList = DataSupport.where("cityid = ?",String.valueOf(selectedCity.getId())).find(Country.class);
+        countryList = DataSupport.where("cityid = ?", String.valueOf(selectedCity.getId())).find(Country.class);
         if (countryList.size()>0){
             dataList.clear();
-            for (Country country:countryList){
+            for (Country country: countryList){
                 dataList.add(country.getCountryName());
             }
             adapter.notifyDataSetChanged();
@@ -197,8 +203,8 @@ public class ChooseAreaFragment extends Fragment {
 
     /**
      * 根据传入的地址从服务器上查询省市县的数据
-     * @param address
-     * @param type
+     * @param address 请求地址
+     * @param type 类型
      */
 
     private void queryFromServer(String address, final String type) {
@@ -256,7 +262,6 @@ public class ChooseAreaFragment extends Fragment {
     /**
      * 显示进度对话框
      */
-
     private void showProgressDialog() {
         if (progressDialog == null){
             progressDialog = new ProgressDialog(getActivity());
